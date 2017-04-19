@@ -1,7 +1,7 @@
 ---
-title: "Practical Topic 8"
+title: "ENVX2001 Practical Topic 8 Multi-linear regression"
 author: "Willem Vervoort"
-date: "`r Sys.Date()`"
+date: "Document generated on `r Sys.Date()`"
 output: 
     pdf_document:
       fig_width: 7
@@ -22,11 +22,11 @@ library(knitr)
 * Learn to use the correlation matrix as an exploratory data analysis tool;
 * Learn to perform MLR and interpret the results using (i) R and (ii) Excel
 
-**DATA:	Data_Topic9_2016.xls**
+**DATA:	Data_Topic8_2017.xls**
 
 # EXERCISE 1 - PERFORMING SLR IN R looking at toxicity in peanuts
 
-Data:  *Peanuts* worksheet
+Data:  *Peanuts* worksheet, *Data_peanuts_Week8.csv*
 
 The data comprise, for 34 batches, the average level of the fungal contaminant aflatoxin in a sample of 120 pounds of peanuts and the percentage of non-contaminated peanuts in the whole batch. The data were collected with the aim of being able to predict the percentage of non-contaminated peanuts (‘percent’) from the aflatoxin level (‘toxin’) in a sample.
 
@@ -213,18 +213,3 @@ rcorr(as.matrix(Loynlog))
 pairs(Loynlog)
 ``` 
 
-# EXERCISE 4 – MODELLING BIRD ABUNDANCE
-
-Data:  *Loyn2* worksheet, *2017_Loyn2.csv*
-
-This worksheet has 6 predictor variables but note the 3 new names [L10AREA, L10DIST, L10LDIST].  They are the log10 transformed versions of AREA, DIST and LDIST.  Each of these variables was log transformed as they had a small number of larger observations with high leverage.
-Import into R using `read.csv()`
-
-Use R for the following analysis
-
-1.	Obtain the correlation between ABUND and all of the 6 predictor variables using `cor()`.  Based on these, what would you expect to be the best single predictor of ABUND?  
-2.	Use multiple regression to see whether ABUND can be predicted from L10AREA and GRAZE.  Is there a significant relationship?  Are the assumptions met? We are using these 2 predictors as they have the largest absolute correlations. Use `lm()` and specify the model as `ABUND~L10AREA + GRAZE`.  
-3.	How good is the model based on the (i) *r*^2^ (ii) adjusted *r*^2^? Use `summary()`.  
-4.	Which variable(s) has the most significant effect(s)? (Refer specifically to the t probabilities in the table of predictors and their estimated parameters or coefficients in the output of `summary()`).  Interpret the p-values in terms of dropping predictor variables.  
-5.	Repeat the multiple regression, but this time include YRS.ISOL as a predictor variable (it has the 3rd largest absolute correlation). This will allow you to assess the effect of YRS.ISOL with the other variables taken into account.  Compare the *r*^2^ and adjusted *r*^2^ values with those you calculated for the 2 predictor model.  
-6.	Which is the better model?  Why?  
