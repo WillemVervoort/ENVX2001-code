@@ -1,0 +1,296 @@
+---
+title: "ENVX2001 Practical Topic 10 Prediction and model quality"
+author: "Willem Vervoort"
+date: "Document generated on `r Sys.Date()`"
+output: 
+    pdf_document:
+      fig_width: 7
+      fig_height: 6
+      fig_caption: true
+---
+```{r setup, warning=F, message=F, echo=F}
+# root dir
+knitr::opts_knit$set(root.dir = 
+                       "z:/willem/teaching/envx2001/otherdata")
+library(pander)
+library(knitr)
+```
+
+# Objectives  
+
+*  Making predictions using a developed model and understand confidence;  
+*  Understand the difference between adjusted *r*^2^ and *r*^2^ to describe model quality;  
+*  Test model quality using validation and calculation of quality measures.
+
+**DATA**:	*Data_Topic10_2017.xls*
+
+# EXERCISE 1 MAKING PREDICTIONS ON CALIFORNIAN STREAMFLOW
+
+Data:  *California streamflow worksheet*, *2017_Californiastreamflow.csv*
+
+Use the best model with 2 variables identified last week:
+```{r readDataStream}
+# read in the data
+s.data <- read.csv("2017_Californiastreamflow.csv")
+names(s.data)
+# best model
+ML_Mod2 <- lm(L10BSAAM ~ L10OPRC + L10OBPC, data = s.data)
+summary(ML_Mod2)
+```
+
+If we wish to predict y for a specific pair of values of x1 and x2, we can simply substitute these into the fitted model:
+
+$\hat{y} = 3.35762 + 0.44437*L10OPRC + 0.21051*L10OBPC$
+
+For example, if L10OPRC = 2 and L10OBPC = 3, then L10BSAAM = $\hat{y} = 4.87789$. 
+
+It is also convention to give a standard error (SE) for any prediction. The formula for the SE of a prediction from a 2 predictor linear regression model is complex (see page 215 of Med et al, 2003). However, in  R it is simple to also return a corresponding SE value using `predict()` and specifying `se.fit=T`. In this case the output will then include an element called "se.fit".
+The tricky bit with `predict()` in R is that you need to specify `newdata` (see the help file), which has to be exactly the same structure as the original data. So to repeat the above example in R:
+```{r}
+# create a new data frame with the variables to predict at
+# Note that it does not matter what you put in for CornP
+new.df <- data.frame(L10BSAAM = 0, L10OPRC = 2, L10OBPC = 3)
+# now use predict() and specify se.fit=T
+predLake <- predict(ML_Mod2, newdata = new.df, se.fit = T)
+# the output now has two elements:
+# the fit
+predLake$fit
+# the se of the fit
+predLake$se.fit
+```
+
+This prediction is well within the original data set.  
+a. Why? You can use `range()` to figure this out, or just look at the original data.  
+
+More interesting is making prediction not part of the original data, but as we discussed in the lectures this means there is a different confidence interval. R allows you to define the interval using `interval = "prediction"`. The output will then include both the fitted and the prediction confidence interval and the default is to calculate the 95% confidence interval. If you want to calculate the actual se.fit, you need to subtract the actual prediction and divide by the t~0.05~ for `df = 43`.  
+
+```{r newdf}
+# create a new data frame with the variables to predict at
+# Note that it does not matter what you put in for L10BSAAM
+new.df <- data.frame(L10BSAAM=rep(0,5), L10OPRC = seq(3.0,4.0, length=5),
+                     L10OBPC=seq(3.0,4.0, length=5))
+```
+
+b. Now use `predict()` and specify `interval="prediction".  
+
+```{asis, echo = F}
+####Answer
+```
+```{r Lake_predict, echo = F, eval = F}
+Lake_predict <- predict(ML_Mod2, newdata=new.df, interval="prediction")
+Lake_predict
+```
+
+c. Inspect the output, the lwr and upr columns are the upper and lower confidence intervals. Note that the variation and prediction intervals are fairly small.  
+
+d. To calculate the true se.fit outside the confidence intervals, subtract column 1 from column 3 and divide by 2-tailed t for the interval at df 43 (which is `r qt(0.975,43)`).  
+
+```{asis, eval = F}
+####Answer
+```
+```{r pred_se_Lake, echo = F, eval= F}
+predict.se <- (Lake_predict[,3] - Lake_predict[,1])/qt(0.975,43)
+predict.se
+```
+
+
+#EXERCISE 2 - MEASURES OF MODEL QUALITY *r*^2^ VERSUS ADJUSTED *r*^2^ 
+
+Data:  *California Streamflow* worksheet, *2017_Californiastreamflow.csv*  
+  
+The dataset is again the California Streamflow data used above.  Import the data in R and generate a normally distributed random variable with a mean of 3 and variance of 2 using the following bit of Rcode.
+
+```{r random_number}
+set.seed(100) # to make sure everybody gets the same results
+s.data$random_no <- rnorm(nrow(s.data),3,2) 
+# this generates the random number into the dataset
+```
+  
+We will see the impact of including a totally useless variable, such as this random variable, has on measures of model quality, *r*^2^ and adjusted *r*^2^ values.
+
+**Task**  
+Create two regression models:  
+1.  model L10BSAAM with L10OPRC + L10OPBC  
+2.  model L10BSAAM with L10OPRC + L10OPBC + random_no  
+  
+a. Compare each in terms of their *r*^2^ and adjusted *r*^2^ values. Which performance measure (*r*^2^ or adj *r*^2^) would you use to identify which predictors to use in your model?  
+  
+```{r randno_solution, eval = F, echo = F}
+mod_rand1 <- lm(L10BSAAM~L10OPRC+L10OBPC,data=s.data)
+summary(mod_rand1)
+mod_rand2 <- lm(L10BSAAM~L10OPRC+L10OBPC + random_no ,data=s.data)
+summary(mod_rand2)
+```
+
+```{asis, echo = F}  
+###Solution  
+There is only a small difference in the *r*^2^ and adj *r*^2^ between the models, but one goes up and the other goes down. Since the random number is a totally useless value, this demonstrates that the adjusted *r*^2^ is the better performance measure to use. 
+```
+
+#EXERCISE 3 - VALIDATION AND CHECKING MODEL PREDICTION QUALITY
+
+Data:  *California Streamflow* worksheet, *2017_Californiastreamflow.csv*  
+
+In this exercise we will test the quality of the developed model, but doing it formally using a comparison on a validation data set.
+We have to once again `set.seed()` to make sure your results are the same across the class.
+The first step is to sample 25% of the data as a validation data set from the overall data set. We are doing this by using the function `sample()` to pick a random number of rows. I am using `dim()` to check the dimensions of the data sets.     
+
+```{r sampledata}
+#Only use so we are all get same random numbers - 
+# otherwise R uses computer time to get random number
+set.seed(10)
+
+#Sample 20% of the rows, find row numbers
+indexes <- sample(1:nrow(s.data), size = 0.20*nrow(s.data))
+#Split data
+valid <- s.data[indexes,]
+dim(valid)
+calib <- s.data[-indexes,]
+dim(calib)
+```
+
+Rather than rerunning the calibration we are going to reuse the two models from last week with different data and compare the results. We will use the model with 2 variables and the model with 3 variables.  
+
+```{r DefineModels}
+# use model 2 and model 3 from topic 9 practical (last week)
+# and test which one is the best model, but use calib data
+ML_Mod2 <- lm(L10BSAAM ~ L10OPRC + L10OBPC, data = calib)
+ML_Mod3 <- lm(L10BSAAM ~ L10OPRC + L10OBPC + L10APSAB, data = calib)
+
+# compare the models
+summary(ML_Mod2)
+summary(ML_Mod3)
+```
+
+Based on the results, ML_Mod3 is better  based on a tiny bit better adj *r*^2^. So we should do a more thorough investigation which model is better
+
+You might want to check the residual plots of the predictions. Do you observe anything suspicious?  
+
+```{r ResidualMod2, fig.cap="Residual plots for Model with 2 parameters"}
+par(mfrow=c(2,2))
+plot(ML_Mod2,which=c(1,2,5))
+hist(rstandard(ML_Mod2))
+par(mfrow=c(1,1))
+```
+```{r ResidualMod3, fig.cap="Residual plots for Model with 3 parameters"}
+par(mfrow=c(2,2))
+plot(ML_Mod3,which=c(1,2,5))
+hist(rstandard(ML_Mod3))
+par(mfrow=c(1,1))
+
+```
+
+\newpage
+
+a. Accuracy: check RMSE and bias of the calibrated models. Use the equation for RMSE: $RMSE = \sqrt(\frac{1}{n}(\sum(y - \hat{y})^2)$ and for bias $Bias = \frac{1}{n}(\sum(y - \hat{y})$. Check both the models and for both calibration and validation. To derive the validation data, use (for example for Model 2):
+
+```{r validExample}
+predict(ML_Mod2, newdata = valid)
+```
+
+```{asis, echo = F}
+## SOLUTION
+```
+
+```{r accuracySolution, eval=F, echo=F}
+# Accuracy (RMSE)
+# Calibrations
+(RMSE2 <- sqrt(mean((calib$L10BSAAM - predict(ML_Mod2))^2)))
+(RMSE3 <- sqrt(mean((calib$L10BSAAM - predict(ML_Mod3))^2)))
+
+# now validations
+(RMSE2_valid <- sqrt(mean((valid$L10BSAAM - predict(ML_Mod2, newdata = valid))^2)))
+(RMSE3_valid <- sqrt(mean((valid$L10BSAAM - predict(ML_Mod3, newdata = valid))^2)))
+# RMSE model 3 better
+
+#Bias
+(Bias2 <- mean(calib$L10BSAAM - predict(ML_Mod2)))
+(Bias3 <- mean(calib$L10BSAAM - predict(ML_Mod3)))
+# very small, as they should be!
+
+(Bias2_valid <- mean(valid$L10BSAAM - predict(ML_Mod2, newdata = valid)))
+(Bias3_valid <- mean(valid$L10BSAAM - predict(ML_Mod3, newdata = valid)))
+# again model 3 less biased and both models overpredict!
+```
+
+We can subsequently make a plot of the calibration and validation data sets for both observed data and the predicted data and compare to the 1:1 line.
+
+```{r PlotObsPred, fig.cap = "Plots of predicted versus observed for model with 2 predictors (left) and model with 3 predictors (right)"}
+# plot predicted versus observed
+par(mfrow = c(2,1), mar=c(4,4,3,2))
+# model 2
+plot(calib$L10BSAAM, predict(ML_Mod2), 
+     # colour = red, type = "16" and size is 20% larger
+     pch = 16, col = "red", cex = 1.2,
+     # add titles for axes and main
+     xlab = "Observed dataset", ylab = "Predicted",
+     main="model 2 predictors")
+# insert a 1:1 line, dashed line, width = 2
+abline(0, 1, lty = 2, lwd = 2)
+# add the validation data
+points(valid$L10BSAAM, predict(ML_Mod2, newdata = valid), 
+       # colour = blue, type = "16" and size is 20% larger
+       col = "blue", pch = 16, cex = 1.2)
+# add a legend to the first plot
+legend("topleft", c("calibration", "validation", "1 : 1 line"), 
+       pch = c(16, 16, NA), lty = c(NA, NA, 2), col = c("red", "blue", 1),
+       # 20% smaller
+       cex=0.8)
+# model 3
+plot(calib$L10BSAAM, predict(ML_Mod3), 
+     # colour = red, type = "16" and size is 20% larger
+     pch = 16, col = "red", cex = 1.2,
+     # add titles for axes and main
+     xlab = "Observed dataset", ylab = "Predicted",
+     main="model 3 predictors")
+# insert a 1:1 line, dashed line, width = 2
+abline(0, 1, lty = 2, lwd = 2)
+# add the validation data
+points(valid$L10BSAAM, predict(ML_Mod3, newdata = valid), 
+       # colour = blue, type = "16" and size is 20% larger
+       col = "blue", pch = 16, cex = 1.2)
+```
+\newpage
+
+This gives the opportunity for a visual inspection, but we can also calculate the correlation (to echo the model derivation) for the calibration and validatio data sets
+
+b. Calculate correlation using `cor()`
+
+```{asis, echo = F}
+## Solution
+```
+```{r correlation, eval = F, echo = F}
+#Correlation
+cor(calib$L10BSAAM, predict(ML_Mod2))
+cor(calib$L10BSAAM, predict(ML_Mod3))
+# we already know this from summary()
+
+cor(valid$L10BSAAM, predict(ML_Mod2, newdata = valid))
+cor(valid$L10BSAAM, predict(ML_Mod3, newdata = valid))
+# confirms bias and RMSE calculations
+```
+
+c. Now calculate Lin's coefficient of concordance, using the lecture slides, don't forget to call `library(epiR)` and maybe `install.packages("epiR")` if the package is not installed.
+
+```{asis, echo = F}
+## SOLUTION Lin's concordance
+```
+```{r LinsConcord, echo = F, eval = F}
+# if needed
+#install.packages("epiR")
+library(epiR)
+
+calib.lcc<-epi.ccc(calib$L10BSAAM, predict(ML_Mod2))
+
+calib.lcc$rho.c
+
+valid.lcc<-epi.ccc(valid$L10BSAAM, predict(ML_Mod2, newdata = valid))
+
+valid.lcc$rho.c
+```
+
+d. Draw conclusions about which model is the best model to predict L10BSAAM from the other variables, use the results to support your argument.
+
+\begin{center}
+END OF PRACTICAL
+\end{center}

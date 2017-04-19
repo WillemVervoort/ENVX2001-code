@@ -19,7 +19,7 @@ library(knitr)
 # Objectives  
 
 *  Learn to perform PARTIAL F-TESTS in R;
-*  Understand the difference between adjusted *r*^2^ and *r*^2^
+*  Understand the difference between adjusted *r*^2^ and *r*^2^;
 *  Learn to perform FORWARD SELECTION and BACKWARD ELIMINATION in R.
 
 **DATA**:	*Data_Topic9_2017.xls*
@@ -31,14 +31,63 @@ Data:  *Loyn2* worksheet, *2017_Loyn2.csv*
 This worksheet has 6 predictor variables but note the 3 new names [L10AREA, L10DIST, L10LDIST].  They are the log10 transformed versions of AREA, DIST and LDIST.  Each of these variables was log transformed as they had a small number of larger observations with high leverage.
 Import into R using `read.csv()`
 
+```{r importdata}
+Loyn2 <- read.csv("2017_Loyn2.csv")
+names(Loyn2)
+```
+
 Use R for the following analysis
 
 1.	Obtain the correlation between ABUND and all of the 6 predictor variables using `cor()`.  Based on these, what would you expect to be the best single predictor of ABUND?  
-2.	Use multiple regression to see whether ABUND can be predicted from L10AREA and GRAZE.  Is there a significant relationship?  Are the assumptions met? We are using these 2 predictors as they have the largest absolute correlations. Use `lm()` and specify the model as `ABUND~L10AREA + GRAZE`.  
+```{r, echo = F, eval = F}
+rcorr(as.matrix(Loyn2))
+```
+```{asis, echo = F}
+The best single predictor would be L10Area as this has the highest *r*
+```
+
+2.	Use multiple regression to see whether ABUND can be predicted from L10AREA and GRAZE.  Is there a significant relationship?  Are the assumptions met? We are using these 2 predictors as they have the largest absolute correlations. Use `lm()` and specify the model as `ABUND~L10AREA + GRAZE`. 
+
+```{r mlmod, eval=F, echo = F}
+lm.mod1 <- lm(ABUND~GRAZE + L10AREA,data=Loyn2)
+summary(lm.mod1)
+par(mfrow=c(2,2))
+plot(lm.mod1,c(1,2,5))
+hist(resid(lm.mod1))
+par(mfrow=c(1,1))
+```
+```{asis, echo = F}
+This is a significant model as both b1 and b2 are significant and the model is significant.
+
+The residuals look reasonable. They are approximately normally distributed (both right hand plots), but possibly the variance is not totally constant and there are possibly a few values with high leverage (left hand plots).  
+```
+
 3.	How good is the model based on the (i) *r*^2^ (ii) adjusted *r*^2^? Use `summary()`.  
+```{asis, echo=F}
+The r-squared is `r summary(lm.mod1)$r.squared` and the adjusted r.squared is `r summary(lm.mod1)$adj.r.squared`.  
+```
+
 4.	Which variable(s) has the most significant effect(s)? (Refer specifically to the t probabilities in the table of predictors and their estimated parameters or coefficients in the output of `summary()`).  Interpret the p-values in terms of dropping predictor variables.  
+
+```{asis, echo = F}
+Both L10Area and GRAZE are highly significant, L10AREA is the most significant. in terms of effect, a 1 unit change in GRAZE results in a -2.8 decrease in abundance, while a 1 unit change in L10AREA, so a 10 unit change in AREA, results in a 6.9 increase in abundance (CHECK THIS). 
+```
+
 5.	Repeat the multiple regression, but this time include YRS.ISOL as a predictor variable (it has the 3rd largest absolute correlation). This will allow you to assess the effect of YRS.ISOL with the other variables taken into account.  Compare the *r*^2^ and adjusted *r*^2^ values with those you calculated for the 2 predictor model.  
+
 6.	Which is the better model?  Why?  
+
+```{r answer5&6, echo=F, eval=F}
+lm.mod2 <- lm(ABUND~GRAZE + L10AREA + YR.ISOL,data=Loyn2)
+summary(lm.mod2)
+par(mfrow=c(2,2))
+plot(lm.mod2,c(1,2,5))
+hist(resid(lm.mod2))
+par(mfrow=c(1,1))
+```
+```{asis, echo = F}
+The residuals look OK, but YR.ISOL is borderline significant (p = 0.0768). The r-squared is `r summary(lm.mod2)$r.squared` and the adjusted r.squared is `r summary(lm.mod2)$adj.r.squared`. Both of these are greater than for model in step 3, so this is a better model.
+```
 
 #EXERCISE 2 - PARTIAL F-TESTS IN R 
 

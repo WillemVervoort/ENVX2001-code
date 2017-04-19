@@ -54,8 +54,26 @@ summary(mod)
 ```
 
 c)	Comment on the overall fit of the regression.  
-d)	Is toxin a significant predictor of percentage non-contaminated peanuts?  
-e)	Interpret the slope parameter in terms of quantifying the relationship between toxin and percent.  
+d)  Inspect and comment on the residual plots
+
+```{r ResidualPlots, echo = F, eval = F}
+par(mfrow=c(2,2))
+plot(mod,which=c(1,2,5))
+hist(rstandard(mod)) # can also use "resid()"
+par(mfrow=c(1,1))
+```
+
+e)	Is toxin a significant predictor of percentage non-contaminated peanuts?  
+f)	Interpret the slope parameter in terms of quantifying the relationship between toxin and percent.  
+
+```{asis, echo = F}
+## Solution  
+
+d) the residual plots look somewhat OK, the q-q plot looks reasonable, but distributions are not totally normal.
+e) yes, as the p-value = `r summary(mod)$coefficients[2,2]`, which is much smaller than 0.05
+f) An increase in toxin by 1 results in a decrease of 0.0029% of uncontaminated peanuts.
+
+```
 
 # EXERCISE 2 – PERFORMING MLR IN R AND EXCEL
 
@@ -109,16 +127,21 @@ Then run:
 A 3-D plot can be made using the function `levelplot()` in lattice.
 Here we plot the OrgP and InorgP in the axes and the levels in the plot are CornP.
 
+It is clear that the 3-D surface plot does not have colours everywhere, but this relates of course to the underlying data. In this case we don't have continuous data in both directions, so the response (the colour) is only plotted where we have input variables.  
+/newpage
+
 ```{r plot3D_data, fig.cap="A 3D plot of the Corn data"}
 require(lattice, quiet = T)
 levelplot(CornP ~ InorgP + OrgP, data = Corn, col.regions = topo.colors(100))
 ```
 
-It is clear that the 3-D surface plot does not have colours everywhere, but this relates of course to the underlying data. In this case we don't have continuous data in both directions, so the response (the colour) is only plotted where we have input variables.
+\newpage
+
+## (ii) MLR in R  
 
 We will now use regression to estimate the joint effects of both inorganic phosphorus and organic phosphorus on the phosphorus content of corn. 
 
-## (ii) MLR in R  
+$CornP = \beta_0 + \beta_1 InorgP + \beta_2 OrgP + error$
 
 This is fairly simple and follows the same structure as simple linear regression and uses `lm()`.  
 
@@ -154,7 +177,7 @@ The output is as follows (we are not showing the plots however):
 
 ![MLR output in Excel.](../ENVX2001-code/MLR_ExcelOutput.png)
 
-******
+\newpage  
 
 # EXERCISE 3 – THE CORRELATION MATRIX AS A TOOL FOR EXPLORATORY DATA ANALYSIS
 
