@@ -1,30 +1,235 @@
 ---
 title: "Tutorial topic 10, prediction and model quality"
 author: "Willem Vervoort"
-date: "April 19, 2017"
-output: pdf_document
+date: "Document generated on `r Sys.Date()`"
+output: 
+    pdf_document:
+      fig_width: 7
+      fig_height: 6
+      fig_caption: true
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, warning=F, message=F, echo=F}
+# root dir
+knitr::opts_knit$set(root.dir = 
+                       "z:/willem/teaching/envx2001/otherdata")
+library(pander)
+library(knitr)
 ```
 
-## R Markdown
+# Objectives  
+* Interpret confidence intervals and prediction intervals;
+* Calculate the bias and the RMSE for a validation set;
+* Interpret model validation output to decide the best model.
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+# EXERCISE 1 – Prediction and standard error of fit.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+We will use the Corn dataset to predict y (CornP) for a specific pair of values of InorgP and OrgP, and we can simply substitute these into the fitted model:
 
-```{r cars}
-summary(cars)
+\begin{center}
+$\hat{y} = 66.465 + 1.290*InorgP - 0.111*OrgP$
+\end{center}
+
+Here is a table of the data for which we would like a prediction
+
+```{r dataNewCorn, echo = F}
+# predict some data with the model, add some normal noise based on rmse
+# 5 data points should be enough
+# use random range of InorgP and OrgP, some outside the data?
+set.seed(2)
+Corn <- read.csv("2017_CornData_topic8.csv")
+newC <- data.frame(CornP = rep(0,5),InorgP = round(rnorm(5,mean(Corn$InorgP),sd(Corn$InorgP)),2), OrgP = floor(rnorm(5,mean(Corn$OrgP),sd(Corn$OrgP))))
+mod <- lm(CornP~InorgP + OrgP, data=Corn)
+newC$CornP <- round(predict(mod,newdata=newC) + rnorm(5),1)
+```
+```{r displayNewdata}
+pander(newC[,2:3], caption="Organic and Inorganic Phosphorus data")
 ```
 
-## Including Plots
+We can easily calculate the new values of CornP using the equation, but we cannot calculate the confidence intervals using the formula we learned in the lecture.  
 
-You can also embed plots, for example:
+\begin{center}
+$se_{\hat{y}} =\sqrt{s^2(1+\frac{1}{n}+\frac{(x-\bar{x})^2}{(n-1)*s^2_x})}$
+\end{center}
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+The predictions are:
+```{r predictEq}
+newCP <- (66.645 + 1.290*newC$InorgP - 0.111*newC$OrgP)
+pander(newCP)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+**A.** Why can we not calculate the standard errors of the fit, using the equation given in the lecture?
+
+```{asis answer_1a, echo = F}
+Answer a: Because the formula is for a simple linear regression and here we have *x*_1 and *x*_2
+```
+
+Luckily R comes to the rescue and we can simply run:
+
+```{r predictMod}
+mod <- lm(CornP~InorgP + OrgP, data=Corn)
+newCornP <- predict(mod,newdata=newC, interval = "confidence", se.fit=T)
+pander(newCornP$fit, caption="Prediction with confidence intervals")
+# and
+newCornP_se <- predict(mod,newdata=newC, interval = "prediction")
+pander(newCornP_se, caption="Prediction with prediction intervals")
+```
+
+**B.** explain the difference between `interval = "confidence"` and `interval = "prediction"` (or the difference between the values in lwr and upr in the two tables). 
+
+```{asis answer_1b, echo = F}
+The difference between confidence and prediction is that the confidence intervals focus on the prediction of the mean value of y while the prediction intervals focus on prediction of a future value of y.
+```
+
+We can identify the se of the fit for confidence interval from the r output:
+```{r se_fit}
+pander(newCornP$se.fit, caption="se.fit for the confidence intervals")
+```
+**C.** What is the relationship between the se_fit of the prediction interval and the lwr and upr in the table?
+
+```{asis answer_1c, eval = F, echo = F}
+The t_value to use is based on the df of the Corn data set: df = `r nrow(Corn)-1`, and then can be defined as `qt(0.975,(nrow(Corn)-1))` = `r qt(0.975,(nrow(Corn)-1))`
+The se_fit for the prediction interval can be calculated as `(fit - lwr)/qt(0.975,(nrow(Corn)-1))`
+```
+
+
+# EXERCISE 2 Calculate Bias and RMSE
+
+Someone has gone out and actually measured CornP related to the data in the earlier table. Here are the results:
+```{r Measured}
+pander(newC, caption="observed data of CornP to match with Table 3" )
+```
+
+The bias in the prediction can be calculated as: 
+\begin{center}
+$BIAS = \frac{\sqrt{\sum^n_{i-1}(y_i - \hat{y}_i)}}{n}$
+\end{center}
+
+**A.** Calculate the bias in the prediction from Table 3 and Table 5. You can use R or excel for this, or do it by hand. Comment on wether the model over or under predicts.
+
+```{r answer_2a, eval = F, echo = F}
+(bias <- sqrt(sum(newC[,1] - newCornP_se[,1]))/5)
+```
+```{asis answer_2a_text, echo = F}
+The model overpredicts
+```
+
+The root mean square error of the prediction can be calculated as:
+\begin{center}
+$RMSE = \frac{\sqrt{\sum^n_{i-1}(y_i - \hat{y}_i)^2}}{n}$
+\end{center}
+
+**B.** Calculate the RMSE in the prediction from the table 3 and table 5. You can use R or Excel to do this, or do it by hand. Comment on the accuracy of the model.
+
+```{r answer_2b, eval = F, echo = F}
+(RMSE <- sqrt(sum(newC[,1] - newCornP_se[,1])^2)/5)
+```
+```{asis answer_2b_text, echo = F, eval = F}
+The model model is fairly accurate as a RMSE of `r RMSE` is only small compared to the range of CornP in the data `r range(Corn$CornP)`
+```
+
+# EXERCISE 3 Evaluate model quality using validation (an example exam question?)
+
+To help you prepare, here is a question that could be similar to an exam question (no promises).
+This data consists of the measurements of Chlorophyll A (blue green algae). Blue green algae are a major drinking water quality concern, particularly in summer, however chlorophyll A is expensive and difficult to measure. We would like to find out what other water quality parameters can be used to predict chlorophyll A:
+
+Response variable (y)
+Chla and transformed log10Chla: measure of chlorophyll A (mg/L)
+
+Predictor variables:
+
+1. maxPH: Maximum pH occurring on the measurement day, this is a measure of the alkalinity or acidity of the water (pH units);
+2. Cl and transformed log10Cl: concentration of Chloride in the water on the measurement day (mg/L);
+3. PO4 and transformed log10PO4: concentration of Phosphate in the water on the measurement day (mg/L).
+
+Here is a snapshot of the data
+```{r readData_split, echo = F}
+chl_data <- read.csv("2017_Algae_subTopic10.csv")
+set.seed(2)
+larger <- chl_data[chl_data$log10Chla>1,]
+smaller<- chl_data[chl_data$log10Chla<=1,]
+indexes <- sample(1:nrow(larger), 
+                  size = floor(0.50*nrow(larger)))
+#Split data
+chl_valid <- larger[indexes,]
+chl_calib <- rbind(larger[-indexes,],smaller)
+pander(chl_calib[1:5,])
+```
+
+The researchers, after going through variable selection have identified a model that includes maxPH, log10Cl and log10PO4 as the best model and now want to test this on a validation data set and assess the quality of the model.
+
+Here is the summary of the final model and the residual plots
+
+```{r algae_model, fig.cap="residual plots of the final algae prediction model"}
+algae_mod <- lm(log10Chla ~ maxPH + log10Cl + log10PO4, data = chl_calib)
+summary(algae_mod)
+par(mfrow=c(2,2))
+plot(algae_mod,which=c(1,2,5))
+hist(rstandard(algae_mod))
+par(mfrow=c(1,1))
+```
+
+**A.** Comment on the overall fit of the model
+
+```{asis answer_3a, echo=F}
+The model is reasonable and explains about `r round(summary(algae_mod)$r.squared,2)*100 percent of the variation in the data, and all the variables are significant. The residual plots look reasonable, normally distributed and only one point outside the 0.5 Cook's distance.
+```
+
+As the researchers have set aside part of the data for validation, we can check how well the model performs in validation. For this we first need to make a prediction and then calculate bias, RMSE and correlation and Lin's rho
+
+Following the lecture material:
+```{r validExample}
+chl_predict <- predict(algae_mod, newdata = chl_valid)
+# Accuracy (RMSE)
+(RMSE_chl <- sqrt(mean((chl_valid$log10Chla - chl_predict)^2)))
+
+# Bias
+(Bias_chl <- mean(chl_valid$log10Chla - chl_predict))
+```
+
+**B.** Comment on the RMSE and bias and what this tells about the validation of the model and possibly the choice of the validation data set
+
+The researchers now also calculated the correlation and Lin's concordance.
+
+```{r correlation}
+#Correlation
+cor(chl_valid$log10Chla,chl_predict)
+
+#install.packages("epiR")
+library(epiR)
+
+valid.lcc<-epi.ccc(chl_valid$log10Chla, chl_predict)
+valid.lcc$rho.c
+```
+
+**C.** Comment on the correlation and Lin's concordance in relation to the model output and explain if you think this model would be a useful model to make predictions of the occurence of Algae based on measurements of pH, Cl and PO4.
+
+```{asis answer_3c}
+Clearly the correlation of the validation is poorer than for the calibration, but this initself is not surprising, this often happens. More concerning is the low value of Lin's concordance, which indicates the predictions are far from the 1:1 line and not in agreement. This suggest the model is not very good to predict future values of chla based on measurements of pH, Cl and PO4. Some more work identifying why the performance of the model in validation is poor is needed.
+```
+
+\newpage  
+We can now plot observed against predicted.
+
+```{r PlotObsPred, fig.cap = "Plot of predicted versus observed for the algae model"}
+# plot predicted versus observed
+plot(chl_calib$log10Chla, predict(algae_mod), 
+     # colour = red, type = "16" and size is 20% larger
+     pch = 16, col = "red", cex = 1.2,
+     # add titles for axes and main
+     xlab = "Observed dataset", ylab = "Predicted")
+# insert a 1:1 line, dashed line, width = 2
+abline(0, 1, lty = 2, lwd = 2)
+# add the validation data
+points(chl_valid$log10Chla, chl_predict, 
+       # colour = blue, type = "16" and size is 20% larger
+       col = "blue", pch = 16, cex = 1.2)
+# add a legend to the first plot
+legend("topleft", c("calibration", "validation", "1 : 1 line"), 
+       pch = c(16, 16, NA), lty = c(NA, NA, 2), col = c("red", "blue", 1))
+```
+
+d. Comment on whether this explains the results from b. and c.
+
+```{asis answer_3d, echo = F}
+Yes it partly does, as this shows the validation set was biased and located at the high end of the data. However, this still means that the original model is not suitable, as clearly this does not fully explain the behaviour of the data.
+```

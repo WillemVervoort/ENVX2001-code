@@ -62,12 +62,13 @@ predLake$se.fit
 This prediction is well within the original data set.  
 a. Why? You can use `range()` to figure this out, or just look at the original data.  
 
-More interesting is making prediction not part of the original data, but as we discussed in the lectures this means there is a different confidence interval. R allows you to define the interval using `interval = "prediction"`. The output will then include both the fitted and the prediction confidence interval and the default is to calculate the 95% confidence interval. If you want to calculate the actual se.fit, you need to subtract the actual prediction and divide by the t~0.05~ for `df = 43`.  
+More interesting is making prediction not part of the original data, but as we discussed in the lectures this means there is a different confidence interval. R allows you to define the interval using `interval = "prediction"`. The output will then include both the fitted and the prediction confidence interval and the default is to calculate the 95% confidence interval. If you want to calculate the actual se.fit from the output, you need to subtract the actual prediction and divide by the t~0.05~ for `df = 43`.  
 
 ```{r newdf}
 # create a new data frame with the variables to predict at
 # Note that it does not matter what you put in for L10BSAAM
-new.df <- data.frame(L10BSAAM=rep(0,5), L10OPRC = seq(3.0,4.0, length=5),
+new.df <- data.frame(L10BSAAM=rep(0,5), 
+                     L10OPRC = seq(3.0,4.0, length=5),
                      L10OBPC=seq(3.0,4.0, length=5))
 ```
 
@@ -83,13 +84,13 @@ Lake_predict
 
 c. Inspect the output, the lwr and upr columns are the upper and lower confidence intervals. Note that the variation and prediction intervals are fairly small.  
 
-d. To calculate the true se.fit outside the confidence intervals, subtract column 1 from column 3 and divide by 2-tailed t for the interval at df 43 (which is `r qt(0.975,43)`).  
+d. To calculate the true se.fit outside the confidence intervals, subtract column 1 from column 3 and divide by 2-tailed t for the interval at df 42 (which is `r round(qt(0.975,42),2)`).  
 
 ```{asis, eval = F}
 ####Answer
 ```
 ```{r pred_se_Lake, echo = F, eval= F}
-predict.se <- (Lake_predict[,3] - Lake_predict[,1])/qt(0.975,43)
+predict.se <- (Lake_predict[,3] - Lake_predict[,1])/qt(0.975,42)
 predict.se
 ```
 
@@ -252,7 +253,7 @@ points(valid$L10BSAAM, predict(ML_Mod3, newdata = valid),
 ```
 \newpage
 
-This gives the opportunity for a visual inspection, but we can also calculate the correlation (to echo the model derivation) for the calibration and validatio data sets
+This gives the opportunity for a visual inspection, but we can also calculate the correlation (to echo the model derivation) for the calibration and validation data sets
 
 b. Calculate correlation using `cor()`
 
