@@ -44,7 +44,9 @@ with(Peanuts,plot(Toxin,Percent))
 ```
 
 b)	Use simple linear regression (`lm()`) in R to fit a straight line to the data. What is the fitted model?  
-
+```{asis, echo = F}
+**ANSWER**  
+```
 ```{r lmPeanuts, eval=F, echo=F}
 # fit a linear model using lm()
 mod <- lm(Percent~Toxin, data=Peanuts)
@@ -53,9 +55,16 @@ summary(mod)
 
 ```
 
-c)	Comment on the overall fit of the regression.  
+c)	Comment on the overall fit of the regression. 
+```{asis, echo = F}
+**ANSWER**  
+The overall fit is good, with 82% of the variation explained. The model is significant with a p-value for $\beta1 < 0.05$ therefor indicating that the slope is significantly different from 0 and negative in this case (-0.0029).
+```
 d)  Inspect and comment on the residual plots
-
+```{asis, echo = F}
+**ANSWER**  
+There seems to be no problem with the residual plots, the data are normally distributed and there is no indication of fanning (increasing variance) in the residuals.
+```
 ```{r ResidualPlots, echo = F, eval = F}
 par(mfrow=c(2,2))
 plot(mod,which=c(1,2,5))
@@ -63,13 +72,13 @@ hist(rstandard(mod)) # can also use "resid()"
 par(mfrow=c(1,1))
 ```
 
+
 e)	Is toxin a significant predictor of percentage non-contaminated peanuts?  
 f)	Interpret the slope parameter in terms of quantifying the relationship between toxin and percent.  
 
 ```{asis, echo = F}
-## Solution  
+**Answer**   
 
-d) the residual plots look somewhat OK, the q-q plot looks reasonable, but distributions are not totally normal.
 e) yes, as the p-value = `r summary(mod)$coefficients[2,2]`, which is much smaller than 0.05
 f) An increase in toxin by 1 results in a decrease of 0.0029% of uncontaminated peanuts.
 
@@ -109,7 +118,7 @@ with(Corn,cor.test(CornP,InorgP))
 ```
 These results tell you that the correlation between CornP and InorgP is significant and that the p-value for this is `r with(Corn,cor.test(CornP,InorgP))$p.value`.
 To do all the correlations together use the function `rcorr()`, which is in the package `Hmisc`, but the data have to be a `matrix`. You might have to first install the package:  
-```{r}
+```{r HMISC}
 #install.packages("Hmisc")
 require(Hmisc, quiet = T)
 ```
@@ -118,9 +127,19 @@ Then run:
 `rcorr(as.matrix(Corn))`  
 
 ### **Tasks:** 
-
 1.  What do the results tell you? The top part repeats the correlations which you also got with `cor()`, but the bottom part gives the p-values. Which of the correlations are significant? If you would construct a regression model would you select both variables or just one?  
+
+```{asis answer_2_1, echo=F}
+**ANSWER**  
+These results tell you that the correlation between CornP and InorgP is significant and that the p-value for this is 0.0011149.
+The `rcorr()` results tell you that, in fact, the relationship between CornP and OrgP is not significant (p = 0.44) and there is also no significant correlation between OrgP and InorgP.
+```
+
 2.  If we were to fit a single predictor model involving EITHER InorgP OR OrgP, then which model would be more successful? (Hint, the *r*^2^ is exactly that for a single predictor regression, the square of the correlation, *r*).  
+```{asis answer_2_2, echo=F}
+**ANSWER**  
+The more successful model would be $CornP = \beta_0 + \beta_1 InorgP$ as the correlation between CornP and InorgP is significant and the r is greater than between CornP and OrgP, which is also insignificant.
+```
 
 ### simple 3-D plot
 
@@ -146,7 +165,7 @@ $CornP = \beta_0 + \beta_1 InorgP + \beta_2 OrgP + error$
 This is fairly simple and follows the same structure as simple linear regression and uses `lm()`.  
 
 In this case:  
-```{r}
+```{r MLR}
 MLR.Corn <- lm(CornP~InorgP + OrgP,data=Corn)
 # run anova() to see the anova table
 anova(MLR.Corn)
@@ -156,7 +175,7 @@ summary(MLR.Corn)
 
 Firstly though, let's check the assumptions of regression are met via residual diagnostics. We demonstrated this in class, you can simply use `plot()` on the regression model object (`MLR.Corn`) to get the plots, but we limit ourselves to plot 1,2 and 5 in the output, which is defined in `which=c(1,2,5)`. We also plot the histogram of the resiudals using `hist(resid(MLR.Corn))`. The `par(mfrow=c(2,2))` simply splits the plot into 4 components and allows you to plot everything together. `par(mfrow=c(1,1))` puts the default back  
 
-```{r, fig.width=5,fig.height=6, fig.cap="Diagnostic plots for Corn data"}
+```{r MLR_resid, fig.width=5,fig.height=6, fig.cap="Diagnostic plots for Corn data"}
 par(mfrow=c(2,2))
 plot(MLR.Corn,which=c(1,2,5))
 hist(resid(MLR.Corn))
@@ -166,9 +185,18 @@ par(mfrow=c(1,1))
 ### **Task**
 Are there any apparent problems with normality of CornP residuals or equality of variance for this small data set?
 
-## (iii) MLR in Excel  
+```{asis answer_ii_resid, echo=F}
+**Answer:**
 
-(remember to activate the Data Analysis add in).
+no there is not as the distribution is approximately normal and the variance is constant.
+```
+
+## (iii) MLR in Excel  
+```{asis, echo = F}
+**ANSWER**  
+MLR in Excel See Solutions_Data_Topic8_2017.xls.  
+```
+(remember to activate the Data Analysis add in).  
 Excel requires each predictor variable to be side by side. The following screen capture requests a bivariate regression (predictors in columns B and C) with residual plots and tests of normality.  
 
 ![MLR in Excel.](../ENVX2001-code/MLR_in_EXCEL.jpg)
@@ -196,17 +224,22 @@ This dataset is from Loyn (1987) which we are using in the lectures.  Fragmentat
 
 In this exercise we will focus on 2 predictors (YRS.ISOL and AREA).  Bring these and the response (ABUND) into R by exporting to a csv file and reading into R using read.csv().
 
-```{r readDataLoyn, eval=F, echo=F}
+```{r readDataLoyn, eval = F, echo = F}
 Loyn <- read.csv("2017_Loyn.csv")
 ```
 
-1.	Examine the histograms of each using `hist()` in R.  Comment on the assumptions for regression being met.
+1.	Examine the histograms of each using `hist()` in R.  Comment on the histograms in terms of leverage.
+```{asis answer_3_1, echo=F}
+**ANSWER**  
+
+The histograms of AREA, DIST and LDIST are very skewed. The high values would have high leverage, this means that these would probably cause the residuals to be skewed. These would be candidates for transformation.  
+```
 ```{r histogramsLoyn, eval=F, echo=F}
 
 par(mfrow=c(4,2))
 hist(Loyn$ABUND)
 hist(Loyn$ALT)
-hist(Loyn$YRS.ISOL)
+hist(Loyn$YR.ISOL)
 hist(Loyn$GRAZE)
 hist(Loyn$AREA)
 hist(Loyn$DIST)
@@ -215,24 +248,48 @@ par(mfrow=c(1,1))
 ```
 
 2.	Calculate the correlation matrix using rcorr() from the Hmisc package or simply cor().  Are the predictors useful?
+```{asis answer_3_2, echo = F}
+**ANSWER**  
 
+Some of the predictors are useful, but AREA has a low and non-significant r.  
+```
 ```{r corLoyn, eval=F, echo=F}
-rcorr(Loyn)
+rcorr(as.matrix(Loyn))
 ```
 
 3.	Examine the scatterplot matrix using pairs(). 
-```{r pairsLoyn, eval=F, echo=F, fig.cap="Pairs plot Loyn data"}
+```{r pairsLoyn, eval = F, echo = F, fig.cap="Pairs plot Loyn data"}
 pairs(Loyn)
 ```
 
-4.	The AREA predictor has a small number of observations with very large values.  Apply a log10 transformation.  Why are you doing this?  
-5.	Repeat steps (1) – (3) using the transformed value of AREA.
-```{r TransfLoyn, eval=F, echo=F}
+4.	The AREA predictor has a small number of observations with very large values.  Apply a log10 transformation.  Why are you doing this?
+```{r transf, eval = F, echo = F}
+# make a copy of the data set
 Loynlog <- Loyn
+# apply transformation
 Loynlog$log10AREA <- log10(Loynlog$AREA)
+# remove original AREA  column
 Loynlog <- Loynlog[,-2]
+```
+```{asis answer3_4, eval = F}
+**ANSWER**  
+
+You do this to stabilise the variance of the regression to manage the leverage of the outliers in the variable. This reduces the skew.
+L10AREA is more likely to be a significant predictor.  
+```
+
+
+5.	Repeat steps (1) – (3) using the transformed value of AREA.
+
+```{asis answer3_5, eval = F}
+**ANSWER**  
+```
+```{r TransfLoyn, eval=F, echo=F}
 hist(Loynlog$log10AREA)
 rcorr(as.matrix(Loynlog))
 pairs(Loynlog)
 ``` 
 
+\begin{center}
+END OF PRACTICAL
+\end{center}

@@ -43,12 +43,18 @@ Use R for the following analysis
 rcorr(as.matrix(Loyn2))
 ```
 ```{asis, echo = F}
+**ANSWER**
+
 The best single predictor would be L10Area as this has the highest *r*
 ```
 
 2.	Use multiple regression to see whether ABUND can be predicted from L10AREA and GRAZE.  Is there a significant relationship?  Are the assumptions met? We are using these 2 predictors as they have the largest absolute correlations. Use `lm()` and specify the model as `ABUND~L10AREA + GRAZE`. 
 
-```{r mlmod, eval=F, echo = F}
+```{asis, echo = F}
+**ANSWER**
+
+```
+```{r mlmod, eval = F, echo = F}
 lm.mod1 <- lm(ABUND~GRAZE + L10AREA,data=Loyn2)
 summary(lm.mod1)
 par(mfrow=c(2,2))
@@ -63,13 +69,17 @@ The residuals look reasonable. They are approximately normally distributed (both
 ```
 
 3.	How good is the model based on the (i) *r*^2^ (ii) adjusted *r*^2^? Use `summary()`.  
-```{asis, echo=F}
+```{asis, echo = F, eval = T}
+**ANSWER**
+
 The r-squared is `r summary(lm.mod1)$r.squared` and the adjusted r.squared is `r summary(lm.mod1)$adj.r.squared`.  
 ```
 
 4.	Which variable(s) has the most significant effect(s)? (Refer specifically to the t probabilities in the table of predictors and their estimated parameters or coefficients in the output of `summary()`).  Interpret the p-values in terms of dropping predictor variables.  
 
 ```{asis, echo = F}
+**ANSWER**
+
 Both L10Area and GRAZE are highly significant, L10AREA is the most significant. in terms of effect, a 1 unit change in GRAZE results in a -2.8 decrease in abundance, while a 1 unit change in L10AREA, so a 10 unit change in AREA, results in a 6.9 increase in abundance (CHECK THIS). 
 ```
 
@@ -86,6 +96,8 @@ hist(resid(lm.mod2))
 par(mfrow=c(1,1))
 ```
 ```{asis, echo = F}
+**ANSWER**
+
 The residuals look OK, but YR.ISOL is borderline significant (p = 0.0768). The r-squared is `r summary(lm.mod2)$r.squared` and the adjusted r.squared is `r summary(lm.mod2)$adj.r.squared`. Both of these are greater than for model in step 3, so this is a better model.
 ```
 
@@ -124,7 +136,11 @@ round(cor(s.data),2)
 ##(2) Partial F-Tests
 The above analysis should tell that you need `L10OPRC` in the model, what should we add next?  This involves performing **PARTIAL F-TESTS** as discussed in the lecture.  This can be done in **R** by using `anova()` on two model objects. So you have to make objects of all the possible model combinations.  
 
-```{r PartialFtests1, eval=F}
+```{asis, echo = F}
+**ANSWER**
+
+```
+```{r PartialFtests1, eval = F}
 ML.Mod1 <- lm(L10BSAAM~L10OPRC + L10OBPC,data=s.data)
 anova(Mod3,ML.Mod1)
 ```
@@ -133,8 +149,9 @@ a. The Regression analysis output gives the test for adding L10OBPC.
 b. The last row gives the results of the partial F-test.  Should we add L10OBPC to the model?  
 c. Write out the hypotheses you are testing.  
 
-```{asis, echo=F}
-###Solution    
+```{asis, echo = F}
+**ANSWER**
+
 Yes, we should add L10OBPC as the p-value is < 0.05  
 The hypothesis   
 H~0~: $\beta_{L10OBPC} = 0$  
@@ -143,30 +160,32 @@ H~1~: $\beta_{L10OBPC} unequal 0$
 
 Perform a PARTIAL F-TEST to work out if the addition of L10APSAB improves upon the model with just L10OPRC.  
 
-```{r SolutionPartialF, echo=F, eval=F}
+```{r SolutionPartialF, echo = F, eval = F}
 ML.Mod2 <- lm(L10BSAAM~L10OPRC + L10APSAB,data=s.data)
 anova(Mod3,ML.Mod2)
 ```
 
 d. Which variable should be added to the model containing L10OPRC?
 
-```{asis, echo=F}  
-###Solution  
+```{asis, echo = F}  
+**ANSWER**
+
 L10APSAB does not improve the model with only L10OPRC ($\beta_{L10APSAB} = 0$)    
 ```
 
 ##(3) 3 variable model
 Based on (2) we either added or did not add an additional predictor to the model with L10OPRC.  If we did not find one of the variables to be significantly improve the single variable model then we stop now.  If you did add a 2nd predictor, then perform a PARTIAL F-TEST to test whether the 3 variable model is superior.  
 
-```{r SolutionThreeVariables, eval=F, echo=F}
+```{r SolutionThreeVariables, eval = F, echo = F}
 ML.Mod3 <- lm(L10BSAAM~L10OPRC + L10OBPC + L10APSAB,data=s.data)
 anova(ML.Mod1,ML.Mod3)
 ```
 
 e. What is your optimal model?
 
-```{asis, echo=F}  
-###Solution  
+```{asis, echo = F}  
+**ANSWER**
+
 The best model is: $L10BSAAM = \beta_0 + \beta_1 L10OPRC + \beta_2 L10OBPC + error$
 ```
 
@@ -200,11 +219,12 @@ and defining the minimum model as:
 Do both approaches identify the same model?  If not, which model would you choose?
 To make this easier, assign both the backwards and forwards step analysis to an R object. You should then be able to run `summary()` on the two objects to compare the final models.
 
-```{asis, echo=F}
-##Solution
+```{asis, echo = F}
+**ANSWER**
+
 The backward model is he better model, as this has the highest adjusted *r*^2^.
 ```
-```{r VarSelectSolution, echo=F, eval=F}
+```{r VarSelectSolution, echo = F, eval = F}
 MaxMod <- lm(Br_Dens ~ ., data=Dippers)
 MinMod <- lm(Br_Dens~1,data=Dippers)
 
@@ -217,4 +237,6 @@ summary(backW)
 summary(forW)
 ```
 
-
+\begin{center}
+END OF PRACTICAL
+\end{center}
