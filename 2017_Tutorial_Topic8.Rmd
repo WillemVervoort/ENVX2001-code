@@ -58,16 +58,16 @@ c)	Is the model significant? Explain why
 
 ##EXERCISE 2 – CORRELATION MATRIX
 
-A biological survey was performed to examine the nature of the variables thought to influence the breeding of British dippers (thrush-sized birds, living mainly in the upper reaches of rivers; they feed on benthic invertebrates by probing the river beds with their beaks). Twenty two sites were included in the survey.  The predictor variables that were measured are:
+A biological survey was performed to examine the nature of the variables thought to influence the breeding of British dippers (thrush-sized birds, living mainly in the upper reaches of rivers; they feed on benthic invertebrates by probing the river beds with their beaks). Twenty two sites were included in the survey.  The predictor variables that were measured are:  
 
-•	site altitude
-•	water hardness
-•	river-bed slope
-•	the numbers of caddis fly larvae 
-•	the numbers of stonefly larvae 
-•	the numbers of mayfly larvae
-•	the numbers of all other invertebrates collected
-•	the breeding density which is the number of breeding pairs of dippers per 10 km of river (this is the response variable) 
+•	site altitude  
+•	water hardness  
+•	river-bed slope  
+•	the numbers of caddis fly larvae  
+•	the numbers of stonefly larvae  
+•	the numbers of mayfly larvae  
+•	the numbers of all other invertebrates collected  
+•	the breeding density which is the number of breeding pairs of dippers per 10 km of river (this is the response variable)   
 
 In the analyses, we transform the four invertebrate variables using a log10(number+1) transformation.
 
