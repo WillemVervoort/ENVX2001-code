@@ -203,7 +203,7 @@ valid.lcc$rho.c
 
 **C.** Comment on the correlation and Lin's concordance in relation to the model output and explain if you think this model would be a useful model to make predictions of the occurence of Algae based on measurements of pH, Cl and PO4.
 
-```{asis answer_3c}
+```{asis answer_3c, echo = F}
 Clearly the correlation of the validation is poorer than for the calibration, but this initself is not surprising, this often happens. More concerning is the low value of Lin's concordance, which indicates the predictions are far from the 1:1 line and not in agreement. This suggest the model is not very good to predict future values of chla based on measurements of pH, Cl and PO4. Some more work identifying why the performance of the model in validation is poor is needed.
 ```
 
