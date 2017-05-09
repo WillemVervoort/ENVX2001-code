@@ -29,17 +29,17 @@ pander(t(data.frame(Year = c(1944, 1945, 1946, 1947,	1948),
 "horses_mult_100,000" = c(28,	26,	22,	20,	19))))
 ```
 
-a)	Calculate the parameters of the line of best fit (simple linear regression). Use slide 6 - 8 from the lectures in week 8 to assist you
+a)	Calculate the parameters of the line of best fit (simple linear regression). Use slide 6 - 8 from the lectures in Topic 8 to assist you
 
 
 
 ```{r emptyTable1, echo=F}
 pander(data.frame("data" = c(rep("",5),"mean"),Year = c(1944, 1945, 1946, 1947,	1948,""), 	
-                  Horses =	c(28,	26,	22,	20,	19, ""), "Year-mean" = rep("",6),	"Horses-mean" = rep("",6),	"Product" = rep("",6)))
+                  Horses =	c(28,	26,	22,	20,	19, ""), "YearMinusMean" = rep("",6),	"HorsesMinusMean" = rep("",6),	"Product" = rep("",6)))
 ```			
 
 
-LINE OF BEST FIT: number of horses  =  		year
+LINE OF BEST FIT: number of horses =  ..... year ...... 
 
 b)	Complete the following hypotheses and ANOVA:
 
@@ -129,5 +129,5 @@ Line of best fit is:
 $breeding_density = b_0 + b_1 RiverSlope + b_2 log(stonefly numbers +1)$.
 \end{center}
 
-b)	**If time permits** solve the simultaneous equations to estimate b_1, b_2 and then b_0.
+b)	**If time permits** solve the simultaneous equations to estimate $b_1$, $b_2$ and then $b_0$.
 
