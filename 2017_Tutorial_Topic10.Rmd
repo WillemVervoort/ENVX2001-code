@@ -7,7 +7,11 @@ output:
       fig_width: 7
       fig_height: 6
       fig_caption: true
+geometry: margin=2cm
 ---
+\fontfamily{lmss}
+\fontsize{14}{18}
+\selectfont
 ```{r setup, warning=F, message=F, echo=F}
 # root dir
 knitr::opts_knit$set(root.dir = 
@@ -41,7 +45,7 @@ newC <- data.frame(CornP = rep(0,5),InorgP = round(rnorm(5,mean(Corn$InorgP),sd(
 mod <- lm(CornP~InorgP + OrgP, data=Corn)
 newC$CornP <- round(predict(mod,newdata=newC) + rnorm(5),1)
 ```
-```{r displayNewdata}
+```{r displayNewdata, echo=F}
 pander(newC[,2:3], caption="Organic and Inorganic Phosphorus data")
 ```
 
@@ -69,7 +73,8 @@ Luckily R comes to the rescue and we can simply run:
 mod <- lm(CornP~InorgP + OrgP, data=Corn)
 newCornP <- predict(mod,newdata=newC, interval = "confidence", se.fit=T)
 pander(newCornP$fit, caption="Prediction with confidence intervals")
-# and
+```
+```{r predictionintervals}
 newCornP_se <- predict(mod,newdata=newC, interval = "prediction")
 pander(newCornP_se, caption="Prediction with prediction intervals")
 ```
@@ -80,8 +85,8 @@ pander(newCornP_se, caption="Prediction with prediction intervals")
 The difference between confidence and prediction is that the confidence intervals focus on the prediction of the mean value of y while the prediction intervals focus on prediction of a future value of y.
 ```
 
-We can identify the se of the fit for confidence interval from the r output:
-```{r se_fit}
+We can identify the se of the fit for confidence interval from the r output using `newCorP$se.fit`:
+```{r se_fit, echo=F}
 pander(newCornP$se.fit, caption="se.fit for the confidence intervals")
 ```
 **C.** What is the relationship between the se_fit of the prediction interval and the lwr and upr in the table?
@@ -95,7 +100,7 @@ The se_fit for the prediction interval can be calculated as `(fit - lwr)/qt(0.97
 # EXERCISE 2 Calculate Bias and RMSE
 
 Someone has gone out and actually measured CornP related to the data in the earlier table. Here are the results:
-```{r Measured}
+```{r Measured, echo=F}
 pander(newC, caption="observed data of CornP to match with Table 3" )
 ```
 

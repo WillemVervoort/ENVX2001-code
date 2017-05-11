@@ -1,6 +1,6 @@
 # ENVX2001 Variable Selection Topic 9
 
-Loyn2 <- read.csv("2016_Loyn2.csv")
+Loyn2 <- read.csv("2017_Loyn2.csv")
 names(Loyn2)
 
 # slide 6
@@ -8,6 +8,11 @@ names(Loyn2)
 MLR_total3 <- lm(ABUND~YR.ISOL+GRAZE+ALT+L10AREA,data=Loyn2)
 anova(MLR_total3)
 summary(MLR_total3)
+
+MLR_total3A <- lm(ABUND~L10AREA+YR.ISOL+GRAZE+ALT,data=Loyn2)
+anova(MLR_total3A)
+summary(MLR_total3A)
+
 
 
 MLR_total4 <- lm(ABUND~YR.ISOL+GRAZE+L10AREA,data=Loyn2)
@@ -39,8 +44,8 @@ anova(Mod1,Mod2)
 # define the maximum model
 maxMod <- lm(ABUND~.,data=Loyn2) # include all variables
 # run step, this automatically runs backward
-step(maxMod)
-
+backmod <- step(maxMod)
+summary(backmod)
 
 # going forward
 # define both minimum and maximum model

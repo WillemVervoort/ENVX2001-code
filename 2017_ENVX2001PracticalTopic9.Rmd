@@ -7,7 +7,11 @@ output:
       fig_width: 7
       fig_height: 6
       fig_caption: true
+geometry: margin=2cm
 ---
+\fontfamily{lmss}
+\fontsize{14}{18}
+\selectfont
 ```{r setup, warning=F, message=F, echo=F}
 # root dir
 knitr::opts_knit$set(root.dir = 

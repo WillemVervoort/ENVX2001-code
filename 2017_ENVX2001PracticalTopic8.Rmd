@@ -7,7 +7,11 @@ output:
       fig_width: 7
       fig_height: 6
       fig_caption: true
+geometry: margin=2cm
 ---
+\fontfamily{lmss}
+\fontsize{14}{18}
+\selectfont
 ```{r setup, warning=F, message=F, echo=F}
 # root dir
 knitr::opts_knit$set(root.dir = 
@@ -33,10 +37,13 @@ The data comprise, for 34 batches, the average level of the fungal contaminant a
 Read in the data using read.csv() after exporting the data as a csv file.
 ```{r LoadPeanutData}
 Peanuts <- read.csv("Data_peanuts_Week8.csv")
+```
+
+```{r showLines, echo=F}
 pander(Peanuts[1:5,], caption="First 5 lines of the Peanuts data set")
 ```
 
-a) In R make a scatter plot (using `plot(data$Toxin,data$Percent)`) of the data. Describe the relationship between the two variables. Would you say that the percentage of non-contaminated peanuts in a batch could be predicted accurately from the level of aflatoxin in a sample via a linear relationship?  
+a) In R make a scatter plot (using `plot(Peanuts$Toxin,Peanuts$Percent)`) of the data. Describe the relationship between the two variables. Would you say that the percentage of non-contaminated peanuts in a batch could be predicted accurately from the level of aflatoxin in a sample via a linear relationship?  
 ```{r scatterplot, fig.cap="Scatter plot of toxin and peanuts", echo=F, eval=F}
 with(Peanuts,plot(Toxin,Percent))
 # or
@@ -98,6 +105,9 @@ In this data
 
 ```{r LoadData}
 Corn <- read.csv("2017_CornData_Topic8.csv")
+```
+
+```{r showdataC, echo=F}
 pander(Corn[1:5,], caption="First 5 lines of the Corn data set")
 
 ```
@@ -214,7 +224,7 @@ Data:  *Loyn* worksheet, *2017_Loyn.csv*
 This dataset is from Loyn (1987) which we are using in the lectures.  Fragmentation of forest habitat has an impact of wildlife abundance.  This study looked at the relationship between bird abundance (bird ha-1) and the characteristics of forest patches at 56 locations in SE Victoria.  The predictor variables are:
 
 •	Altitude (m) [ALT]*
-•	Year when the patch was isolated (years) [YRS.ISOL]
+•	Year when the patch was isolated (years) [YR.ISOL]
 •	Grazing (coded 1-5 which is light to heavy) [GRAZE] 
 •	Patch area (ha) [AREA]
 •	Distance to nearest patch (km) [DIST]
@@ -222,7 +232,7 @@ This dataset is from Loyn (1987) which we are using in the lectures.  Fragmentat
 
 * The name is [ ] is the one used in the Excel worksheet.
 
-In this exercise we will focus on 2 predictors (YRS.ISOL and AREA).  Bring these and the response (ABUND) into R by exporting to a csv file and reading into R using read.csv().
+In this exercise we will focus on 2 predictors (YR.ISOL and AREA).  Bring these and the response (ABUND) into R by exporting to a csv file and reading into R using read.csv().
 
 ```{r readDataLoyn, eval = F, echo = F}
 Loyn <- read.csv("2017_Loyn.csv")
