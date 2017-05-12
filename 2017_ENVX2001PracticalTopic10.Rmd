@@ -52,7 +52,7 @@ It is also convention to give a standard error (SE) for any prediction. The form
 The tricky bit with `predict()` in R is that you need to specify `newdata` (see the help file), which has to be exactly the same structure as the original data. So to repeat the above example in R:
 ```{r}
 # create a new data frame with the variables to predict at
-# Note that it does not matter what you put in for CornP
+# Note that it does not matter what you put in for L10BSAAM
 new.df <- data.frame(L10BSAAM = 0, L10OPRC = 2, L10OBPC = 3)
 # now use predict() and specify se.fit=T
 predLake <- predict(ML_Mod2, newdata = new.df, se.fit = T)
@@ -70,7 +70,8 @@ More interesting is making prediction not part of the original data, but as we d
 
 ```{r newdf}
 # create a new data frame with the variables to predict at
-# Note that it does not matter what you put in for L10BSAAM
+# Note that it again does not matter what you put in for L10BSAAM, 
+# I have put in five 0 values
 new.df <- data.frame(L10BSAAM=rep(0,5), 
                      L10OPRC = seq(3.0,4.0, length=5),
                      L10OBPC=seq(3.0,4.0, length=5))
