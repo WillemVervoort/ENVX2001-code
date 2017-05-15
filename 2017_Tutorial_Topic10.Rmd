@@ -93,7 +93,8 @@ pander(newCornP$se.fit, caption="se.fit for the confidence intervals")
 
 ```{asis answer_1c, eval = F, echo = F}
 The t_value to use is based on the df of the Corn data set: df = `r nrow(Corn)-1`, and then can be defined as `qt(0.975,(nrow(Corn)-1))` = `r qt(0.975,(nrow(Corn)-1))`
-The se_fit for the prediction interval can be calculated as `(fit - lwr)/qt(0.975,(nrow(Corn)-1))`
+The se_fit for the prediction interval can be calculated as 
+`(fit - lwr)/qt(0.975,(nrow(Corn)-1))`
 ```
 
 
@@ -106,21 +107,21 @@ pander(newC, caption="observed data of CornP to match with Table 3" )
 
 The bias in the prediction can be calculated as: 
 \begin{center}
-$BIAS = \frac{\sqrt{\sum^n_{i-1}(y_i - \hat{y}_i)}}{n}$
+$BIAS = \frac{\sum^n_{i=1}(y_i - \hat{y}_i)}{n}$
 \end{center}
 
 **A.** Calculate the bias in the prediction from Table 3 and Table 5. You can use R or excel for this, or do it by hand. Comment on wether the model over or under predicts.
 
 ```{r answer_2a, eval = F, echo = F}
-(bias <- sqrt(sum(newC[,1] - newCornP_se[,1]))/5)
+(bias <- sum(newC[,1] - newCornP_se[,1])/5)
 ```
 ```{asis answer_2a_text, echo = F}
-The model overpredicts
+The model overpredicts, but this is based on only a few data points
 ```
 
 The root mean square error of the prediction can be calculated as:
 \begin{center}
-$RMSE = \frac{\sqrt{\sum^n_{i-1}(y_i - \hat{y}_i)^2}}{n}$
+$RMSE = \frac{\sqrt{\sum^n_{i=1}(y_i - \hat{y}_i)^2}}{n}$
 \end{center}
 
 **B.** Calculate the RMSE in the prediction from the table 3 and table 5. You can use R or Excel to do this, or do it by hand. Comment on the accuracy of the model.
@@ -129,7 +130,7 @@ $RMSE = \frac{\sqrt{\sum^n_{i-1}(y_i - \hat{y}_i)^2}}{n}$
 (RMSE <- sqrt(sum(newC[,1] - newCornP_se[,1])^2)/5)
 ```
 ```{asis answer_2b_text, echo = F, eval = F}
-The model model is fairly accurate as a RMSE of `r RMSE` is only small compared to the range of CornP in the data `r range(Corn$CornP)`
+Based on the limited number of data points, the model is fairly accurate as a RMSE of `r RMSE` is only small compared to the range of CornP in the data `r range(Corn$CornP)`
 ```
 
 # EXERCISE 3 Evaluate model quality using validation (an example exam question?)

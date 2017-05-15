@@ -29,19 +29,6 @@ lines(sort(SoilE$MaxSoilT_C),rep(mean(SoilE$SoilEvap_mm_per_day),nrow(SoilE)),
 hist(SoilE$MaxSoilT_C)
 hist(SoilE$SoilEvap_mm_per_day)
 
-
-# # Only first 10 values
-# SoilE.2 <- SoilE[1:10,]
-# plot(SoilE.2[,1], SoilE.2[,2],xlab="Maximum daily soil T (Celcius)",
-# ylab="Soil evaporation (mm/day)",cex=1.5,lwd=2,col="red",cex.lab=1.3,
-# cex.axis=1.2)
-# 
-# # fit a model
-# line <- lm(SoilE.2[,2] ~ SoilE.2[,1])
-# summary(line)
-# lines(SoilE.2[,1],predict(line),lwd=2,col="green")
-# lines(sort(SoilE.2[,1]),rep(mean(SoilE.2[,2]),nrow(SoilE.2)),lty=2,col="blue",lwd=2)
-
 ## predictions
 # Create a prediction data frame between 35 - 40 C and no data for soil evap
 pred.df <- data.frame(MaxSoilT_C = 35:40, SoilEvap_mm_per_day = rep(NA,6))
@@ -105,7 +92,6 @@ lines(sort(SoilE$MaxSoilT_C),sort(p2$lwr),lty=2,lwd=2,col="green")
 lines(sort(SoilE$MaxSoilT_C),sort(p2$upr),lty=2,lwd=2,col="green")
 legend("topleft",c("data","best fit","confidence", "prediction se"),
        pch=c(1,NA,NA,NA),lty=c(NA,1,2,2),col=c("red",1,"blue","green"))
-
 
 # Back to the Loyn data set
 Loyn <- read.csv("otherdata/2017_Loyn2.csv")
@@ -175,6 +161,59 @@ summary(ML.Loyn)
 
 (Bias_valid <- mean(valid$ABUND - predict(ML.Loyn, newdata = valid)))
 # much larger
+
+# some simulations on the effect of n on the RMSE and bias
+# what if we only calculated  RMSE on a small number of values?
+# 2 sampled rows
+
+# create storage to store simulations
+Store <- data.frame(RMSE = rep(0,10), BIAS = rep(0,10))
+# run a loop to repeat the calculations
+for (i in 1:nrow(Store)) {
+  # sample rows
+  rows <- sample(1:nrow(calib),2)
+  # calculate RMSE
+  (Store[i,1] <- sqrt(mean((calib$ABUND[rows] - predict(ML.Loyn)[rows])^2)))
+  # calculate BIAS
+  (Store[i,2] <- mean(calib$ABUND[rows] - predict(ML.Loyn)[rows]))
+}
+
+# make histograms
+par(mfrow=c(2,1))
+hist(Store[,1], main="RMSE")
+hist(Store[,2], main= "BIAS")
+
+# redo for 10 samples
+for (i in 1:nrow(Store)) {
+  # sample rows
+  rows <- sample(1:nrow(calib),10)
+  # calculate RMSE
+  (Store[i,1] <- sqrt(mean((calib$ABUND[rows] - predict(ML.Loyn)[rows])^2)))
+  # calculate BIAS
+  (Store[i,2] <- mean(calib$ABUND[rows] - predict(ML.Loyn)[rows]))
+}
+
+# make histograms
+par(mfrow=c(2,1))
+hist(Store[,1], main="RMSE")
+hist(Store[,2], main= "BIAS")
+
+# redo for 20 samples
+for (i in 1:nrow(Store)) {
+  # sample rows
+  rows <- sample(1:nrow(calib),20)
+  # calculate RMSE
+  (Store[i,1] <- sqrt(mean((calib$ABUND[rows] - predict(ML.Loyn)[rows])^2)))
+  # calculate BIAS
+  (Store[i,2] <- mean(calib$ABUND[rows] - predict(ML.Loyn)[rows]))
+}
+
+# make histograms
+par(mfrow=c(2,1))
+hist(Store[,"RMSE"], main="RMSE")
+hist(Store[,"BIAS"], main= "BIAS")
+par(mfrow=c(1,1))
+
 
 # plot predicted versus observed
 par(mar=c(5,5,4,2))
