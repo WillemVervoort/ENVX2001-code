@@ -121,13 +121,13 @@ The model overpredicts, but this is based on only a few data points
 
 The root mean square error of the prediction can be calculated as:
 \begin{center}
-$RMSE = \frac{\sqrt{\sum^n_{i=1}(y_i - \hat{y}_i)^2}}{n}$
+$RMSE = \sqrt{\frac{\sum^n_{i=1}(y_i - \hat{y}_i)^2}{n}}$
 \end{center}
 
 **B.** Calculate the RMSE in the prediction from the table 3 and table 5. You can use R or Excel to do this, or do it by hand. Comment on the accuracy of the model.
 
 ```{r answer_2b, eval = F, echo = F}
-(RMSE <- sqrt(sum(newC[,1] - newCornP_se[,1])^2)/5)
+(RMSE <- sqrt(sum((newC[,1] - newCornP_se[,1])^2)/5))
 ```
 ```{asis answer_2b_text, echo = F, eval = F}
 Based on the limited number of data points, the model is fairly accurate as a RMSE of `r RMSE` is only small compared to the range of CornP in the data `r range(Corn$CornP)`
